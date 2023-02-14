@@ -34,6 +34,7 @@ int judge_name(char *name){
 }
 
 Node *judge_path(const char *pathname,Node *cur,int cut){
+    if(cur == NULL) return NULL;
     char jud[31];
     int j = 0,i = 0;
     int len = strlen(pathname) - cut;
@@ -49,10 +50,10 @@ Node *judge_path(const char *pathname,Node *cur,int cut){
     }
     for (; i < len; i++) {
         if(pathname[i] != '/') jud[j++] = pathname[i];
+        if(j>=30) return NULL;
         else if(j > 0) break;
     }
     if(i>=len) return cur;
-    if(i == len) return 0;
     for (int k = 0; k < 101; k++) {
         if(cur->dirents[k]!=NULL){
             if(strcmp(cur->dirents[k]->name,jud)==0){
@@ -71,6 +72,7 @@ int ropen(const char *pathname, int flags) {
     int k = 0;
     for (int i = strlen(pathname) - 1; i >= 0 ; i--) {
         if(pathname[i]!='/') name_[k++] = pathname[i];
+        if(k>=30) return -1;
         else if(k>0) break;
     }
     for (int i = 0; i < k; i++) {
@@ -139,6 +141,7 @@ int ropen(const char *pathname, int flags) {
 
 int rclose(int fd) {
     if(fd>handle_count) return -1;
+    if(lists[fd] == NULL) return -1;
     if(lists[fd]->handle != 0) lists[fd]->handle = 0;
     else return -1;
     return 0;
@@ -197,6 +200,7 @@ int rmkdir(const char *pathname) {
     int k = 0;
     for (int i = strlen(pathname) - 1; i >= 0 ; i--) {
         if(pathname[i]!='/') name_[k++] = pathname[i];
+        if(k>=30) return -1;
         else if(k>0) break;
     }
     for (int i = 0; i < k; i++) {
@@ -224,6 +228,7 @@ int rrmdir(const char *pathname) {
     int k = 0;
     for (int i = strlen(pathname) - 1; i >= 0 ; i--) {
         if(pathname[i]!='/') name_[k++] = pathname[i];
+        if(k>=30) return -1;
         else if(k>0) break;
     }
     for (int i = 0; i < k; i++) {
@@ -251,6 +256,7 @@ int runlink(const char *pathname) {
     int k = 0;
     for (int i = strlen(pathname) - 1; i >= 0 ; i--) {
         if(pathname[i]!='/') name_[k++] = pathname[i];
+        if(k>=30) return -1;
         else if(k>0) break;
     }
     for (int i = 0; i < k; i++) {
@@ -271,6 +277,7 @@ int runlink(const char *pathname) {
 }
 
 void init_ramfs() {
+    root = malloc(sizeof(Node));
     root->type = DIR_NODE;
     root->nrde = 0;
     root->name = "/";
